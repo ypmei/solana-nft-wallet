@@ -7,7 +7,7 @@ const SEED = "metadata"
 const METADATA_PROGRAM_ID = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
 const SOLANA_TOKEN_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
 
-export async function loadWallet(walletAddress="CmwMaWGAwCXqjWSS5FXJfEVuwxV8eDsfAbWgZmvEyjgY") {
+export async function loadWallet(walletAddress) {
     const connection = new Connection(clusterApiUrl('mainnet-beta'))
     const walletPK = toPublicKey(walletAddress)
 

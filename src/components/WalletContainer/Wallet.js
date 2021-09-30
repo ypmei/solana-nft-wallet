@@ -2,41 +2,77 @@ import React, {Component} from 'react';
 import {loadWallet} from "./LoadWallet";
 
 class Wallet extends Component {
-  constructor() {
-    super();
+    constructor() {
+        super();
 
-    this.state = {
-      walletAddress: "CmwMaWGAwCXqjWSS5FXJfEVuwxV8eDsfAbWgZmvEyjgY",
-      nftMetadata: []
+        this.state = {
+            walletAddress: "",
+            isLoading: false,
+            nftMetadata: null
+        }
+
+        this.handleChange = this.handleChange.bind(this)
+        this.getNFTs = this.getNFTs.bind(this)
     }
 
-    this.getNFTs()
-  }
+    async getNFTs() {
+        this.setState({
+            isLoading: true,
+            nftMetadata: null
+        })
+        let nftMetadata = await loadWallet(this.state.walletAddress)
+        this.setState({
+            isLoading: false,
+            nftMetadata: nftMetadata
+        })
+    }
 
-  async getNFTs() {
-    let nftMetadata = await loadWallet("CmwMaWGAwCXqjWSS5FXJfEVuwxV8eDsfAbWgZmvEyjgY")
-    console.log(nftMetadata)
-    this.setState({
-      nftMetadata: nftMetadata
-    })
-  }
+    handleChange(e) {
+        this.setState({walletAddress: e.target.value});
+    }
 
-  render() {
-    return(
 
-        <div className={"text-center sm:text-left container mx-auto px-4 py-4 font-main"}>
-          <p className={"text-4xl py-3 font-bold"}>Wallet Address: <span className={"font-normal"}>{this.state.walletAddress}</span></p>
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 pt-3">
-          {this.state.nftMetadata.map((metadata, i) =>
-              <div className={"text-center"}>
-                    <img className={"rounded-lg shadow-md"} src={metadata.uriJSON.image}/>
-                    <p className={"text-center font-bold pt-3"}>{metadata.uriJSON.name}</p>
-              </div>
-          )}
-          </div>
-        </div>
-    )
-  }
+    render() {
+        return (
+
+            <div className={"text-center sm:text-left container mx-auto px-4 py-4 font-main"}>
+                <div className="py-3">
+                    <div className="rounded-lg bg-white flex items-center shadow-md">
+                        <input className="w-full py-2 px-6 text-gray-700 leading-tight focus:outline-none"
+                               onChange={this.handleChange} id="search" type="text"
+                               placeholder="Enter Wallet Address:"/>
+
+                        <div class="p-4">
+                            <button onClick={() => this.getNFTs()}
+                                    class="bg-blue-500 text-white rounded-full p-2 hover:bg-blue-400 focus:outline-none w-20 h-12 flex items-center justify-center">
+                                Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {this.state.walletAddress.length > 0 && this.state.nftMetadata !== null ?
+                    <div>
+                        <p className={"text-4xl py-3 font-bold"}>Wallet Address: <span
+                            className={"font-normal"}>{this.state.walletAddress}</span></p>
+                        <p className={"text-2xl pb-3 font-bold"}>Total Floor Value: <span
+                            className={"font-normal"}>Coming Soon!</span></p>
+                    </div>
+                    : null}
+                {this.state.nftMetadata === null ? this.state.isLoading ? <p> Loading NFTs... </p> :
+                        <p> Enter in a wallet address </p> :
+                    <div className="grid grid-cols-1 md:grid-cols-6 gap-4 pt-3">
+                        {this.state.nftMetadata.map((metadata, i) =>
+                            <div className={"text-center"}>
+                                <img className={"rounded-lg shadow-md"} src={metadata.uriJSON.image}/>
+                                <p className={"text-center font-bold pt-3"}>{metadata.uriJSON.name}</p>
+                            </div>
+                        )}
+
+                    </div>
+                }
+            </div>
+        )
+    }
 
 }
 
