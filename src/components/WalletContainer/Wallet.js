@@ -61,13 +61,14 @@ class Wallet extends Component {
                     <div>
                         <p className={"text-4xl py-3 font-bold"}>Wallet Address: <span
                             className={"font-normal"}>{this.state.walletAddress}</span></p>
+                        {this.state.nftMetadata.length !== 0 ?
                         <p className={"text-2xl pb-3 font-bold"}>Total Floor Value: <span
-                            className={"font-normal"}>Coming Soon!</span></p>
+                            className={"font-normal"}>Coming Soon!</span></p> : null }
                     </div>
                     : null}
                 {this.state.nftMetadata === null ? this.state.isLoading ? <p>
                             Loading NFTs... </p> :
-                        <p> </p> :
+                    <p> </p> : this.state.nftMetadata.length === 0 ? <p> No NFTs found! Go buy some on Solanart / DigitalEyes - #WAGMI</p>:
                     <div className="grid grid-cols-1 md:grid-cols-6 gap-4 pt-3">
                         {this.state.nftMetadata.map((metadata, i) =>
                             <div className={"text-center"}>
