@@ -9,7 +9,14 @@ const SOLANA_TOKEN_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5
 
 export async function loadWallet(walletAddress) {
     const connection = new Connection(clusterApiUrl('mainnet-beta'))
-    const walletPK = toPublicKey(walletAddress)
+    var walletPK = ""
+
+    try {
+        walletPK = toPublicKey(walletAddress)
+    } catch {
+        alert("Couldn't find wallet at that address. Please enter a valid wallet address.")
+        return null;
+    }
 
     // Array of all token accounts in user's wallet
     const tokens = (await connection.getParsedTokenAccountsByOwner(walletPK, {programId: SOLANA_TOKEN_ID})).value

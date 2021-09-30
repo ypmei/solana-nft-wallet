@@ -16,15 +16,19 @@ class Wallet extends Component {
     }
 
     async getNFTs() {
-        this.setState({
-            isLoading: true,
-            nftMetadata: null
-        })
-        let nftMetadata = await loadWallet(this.state.walletAddress)
-        this.setState({
-            isLoading: false,
-            nftMetadata: nftMetadata
-        })
+        if (this.state.walletAddress.length === 0) {
+            alert("Please enter a valid Solana wallet address!")
+        } else {
+            this.setState({
+                isLoading: true,
+                nftMetadata: null
+            })
+            let nftMetadata = await loadWallet(this.state.walletAddress)
+            this.setState({
+                isLoading: false,
+                nftMetadata: nftMetadata
+            })
+        }
     }
 
     handleChange(e) {
@@ -36,11 +40,14 @@ class Wallet extends Component {
         return (
 
             <div className={"text-center sm:text-left container mx-auto px-4 py-4 font-main"}>
+                <div className="pt-4">
+                    <p className={"text-2xl font-bold"}>Solana NFT Wallet Explorer</p>
+                </div>
                 <div className="py-3">
                     <div className="rounded-lg bg-white flex items-center shadow-md">
                         <input className="w-full py-2 px-6 text-gray-700 leading-tight focus:outline-none"
                                onChange={this.handleChange} id="search" type="text"
-                               placeholder="Enter Wallet Address:"/>
+                               placeholder="Enter Solana Wallet Address:"/>
 
                         <div class="p-4">
                             <button onClick={() => this.getNFTs()}
@@ -58,8 +65,9 @@ class Wallet extends Component {
                             className={"font-normal"}>Coming Soon!</span></p>
                     </div>
                     : null}
-                {this.state.nftMetadata === null ? this.state.isLoading ? <p> Loading NFTs... </p> :
-                        <p> Enter in a wallet address </p> :
+                {this.state.nftMetadata === null ? this.state.isLoading ? <p>
+                            Loading NFTs... </p> :
+                        <p> </p> :
                     <div className="grid grid-cols-1 md:grid-cols-6 gap-4 pt-3">
                         {this.state.nftMetadata.map((metadata, i) =>
                             <div className={"text-center"}>
