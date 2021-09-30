@@ -42,7 +42,7 @@ export async function loadWallet(walletAddress) {
 
         // Add URI JSON to metadata
         metadata["uriJSON"] = await getJSONFromURI(metadata.data.uri)
-        console.log(metadata)
+
         nftMetadata.push(metadata)
     }
 
