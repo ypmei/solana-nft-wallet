@@ -7,6 +7,7 @@ class Wallet extends Component {
         super();
 
         this.state = {
+            inputWalletAddress: "",
             walletAddress: "",
             isLoading: false,
             nftMetadata: null,
@@ -18,7 +19,49 @@ class Wallet extends Component {
         this.getNFTs = this.getNFTs.bind(this)
         this.calculateTotalFloorValue = this.calculateTotalFloorValue.bind(this)
 
-        this.getNFTFloorData()
+        // this.getNFTFloorData()
+    }
+
+    componentDidMount() {
+        let walletAddress = this.props.match.params.walletAddress;
+        if (walletAddress) {
+            this.setState({
+                walletAddress: walletAddress
+            }, () => {
+                if (this.state.floorData === null) {
+                    this.getNFTFloorData()
+                }
+                this.getNFTs()
+            })
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        let walletAddress = this.props.match.params.walletAddress
+
+        if (walletAddress !== this.state.walletAddress && walletAddress !== undefined && walletAddress.length > 0) {
+            this.setState({
+                walletAddress: walletAddress
+            }, () => {
+                if (this.state.floorData === null) {
+                    this.getNFTFloorData()
+                }
+                this.getNFTs()
+            })
+        }
+        // if (this.state.walletAddress !== this.props.match.params.walletAddress) {
+        //     let walletAddress = this.props.match.params.walletAddress;
+        //     if (walletAddress !== this.state.walletAddress) {
+        //         this.setState({
+        //             walletAddress: this.props.walletAddress
+        //         }, () => {
+        //             this.getNFTs()
+        //             if (this.state.floorData === null) {
+        //                 this.getNFTFloorData()
+        //             }
+        //         })
+        //     }
+        // }
     }
 
     async getNFTFloorData() {
@@ -46,7 +89,7 @@ class Wallet extends Component {
     }
 
     handleChange(e) {
-        this.setState({walletAddress: e.target.value});
+        this.setState({inputWalletAddress: e.target.value});
     }
 
     calculateTotalFloorValue() {
@@ -65,8 +108,13 @@ class Wallet extends Component {
 
             <div className={"text-center sm:text-left container mx-auto px-4 py-4 font-main"}>
                 <div className="pt-4 flex justify-between">
-                    <p className={"text-2xl font-bold"}>Solana NFT Wallet Explorer</p>
-                    <p className={"text-gray-500 text-base"}>Sol Tip Jar: EfJeswRanMNzkkLxZN7d9WL5sbm5Z9qfi3EDazZUUCCW</p>
+                    <p className={"text-2xl font-bold my-auto"} onClick={() => this.props.history.push("/")}>Solana NFT Wallet Explorer</p>
+                    <div className="mt-5 text-left">
+                        <p className={"text-gray-500 text-base"}>Sol Tip Jar:
+                            EfJeswRanMNzkkLxZN7d9WL5sbm5Z9qfi3EDazZUUCCW</p>
+                        <p className="text-gray-500">Made by: <a className="text-gray-700 hover:text-gray-900 text-right" target="_blank" href="https://twitter.com/avinashj_">@avinashj_</a></p>
+                    </div>
+
                 </div>
                 <div className="py-3">
                     <div className="rounded-lg bg-white flex items-center shadow-md">
@@ -75,12 +123,17 @@ class Wallet extends Component {
                                placeholder="Enter Solana Wallet Address:"/>
 
                         <div className="p-4">
-                            <button onClick={() => this.getNFTs()}
+                            <button onClick={() => this.props.history.push("/" + this.state.inputWalletAddress)}
                                     className="bg-blue-500 text-white rounded-full p-2 hover:bg-blue-400 focus:outline-none w-20 h-12 flex items-center justify-center">
                                 Search
                             </button>
                         </div>
                     </div>
+                    {this.state.walletAddress === "" ?
+                        <div className="text-base text-center py-3 w-3/4 mx-auto">
+                            <p> Enter in a Wallet address to view its NFTs + calculate total Wallet value from floor prices.</p>
+                        </div>
+                    : null}
                 </div>
                 {this.state.walletAddress.length > 0 && this.state.nftMetadata !== null ?
                     <div>
@@ -90,13 +143,15 @@ class Wallet extends Component {
                             <div>
                                 <p className={"text-2xl font-bold"}>Total Floor Value: <span
                                     className={"font-normal"}>{this.calculateTotalFloorValue() + "◎"}</span></p>
-                                <p className={"text-gray-500 pb-3 text-base"}>Floor prices updated every hour. Last updated: {this.state.floorLastUpdated}</p>
+                                <p className={"text-gray-500 pb-3 text-base"}>Floor prices updated every hour. Last
+                                    updated: {this.state.floorLastUpdated}</p>
                                 {/*<p className={"text-gray-500 pb-3 text-base"}>Add more NFT collections to our API <a>here</a>.</p>*/}
                             </div> : null}
                     </div>
                     : null}
                 {this.state.nftMetadata === null ? this.state.isLoading ? <p className={"flex"}>
-                        <svg width="24" height="24" className="inline-block mr-2" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="#bbb">
+                        <svg width="24" height="24" className="inline-block mr-2" viewBox="0 0 38 38"
+                             xmlns="http://www.w3.org/2000/svg" stroke="#bbb">
                             <g fill="none" fill-rule="evenodd">
                                 <g transform="translate(1 1)" stroke-width="2">
                                     <circle stroke-opacity=".5" cx="18" cy="18" r="18"/>
