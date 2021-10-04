@@ -55,5 +55,16 @@ export const CollectionToUpdateAuthority = {
     'SSBxSolPunks': 'F5FKqzjucNDYymjHLxMR2uBT43QmaqBAMJwjwkvRRw4A',
     'SolStash': 'C5ruRv8VMhLL4WuSVH8jKFGBtbSUQCfFvbojKh7UfXq4',
     'Pixel Dudes': '3anukDBEijov9oVBNNbvCYsUkBc7yYioiCZiGvuWw61e',
-    'Kreechures': '9dMJRRqpWEHL3nekRQMYpWFVLYiGKtdozcFCbMk298p3'
+    'Kreechures': '9dMJRRqpWEHL3nekRQMYpWFVLYiGKtdozcFCbMk298p3',
+    'Meerkat Millionaires': '4FYjfa71puV4PD12cyqXotu6z2FhLiqFSHjEfYiFLnbj',
+    'Skeleton Crew Skulls': 'Sku1HPHt6DE5Qz9q6zFV4MGNPxEJB8sbqXYdPou5PKG',
+    'Famous Fox Federation': '3pMvTLUA9NzZQd4gi725p89mvND1wRNQM3C8XEv1hTdA',
+    'MetaBaes': 'EbR4788Gi79GwcT8cANSq4aDHoxD7XrQVGgCfUiML2wX',
+    'The Slow Patrol': 'SLotheHgmVUnGzAutHvieKRib2EdYw5FjpH7831rSZb',
+    'Gloom Punk Club': '2gpBAeeEqCDGmr6xP54GHWNhy3y6TEx2NXawpnBrKCNk',
+    'Boneworld': '7TKTuN4bGAV3LuRqA7rtC8QHVA34FAKCb8RDKdvaau99',
+    'EitBit Apes': 'JCYqzeqxbQ8TtrJNifUoyYEdRXZZqDUWxqA1WQtQuSGa',
+    'Solarmy 2D': '2XsuasXvCDpc9grH6A3WnthLH8p1oCUZcbsfNDTWSqY3',
+    'Solarmy 3D': '4Nb8q8kWDJhApURK7jYbvHJvx1njRH2seZibMwf9tTv4',
+    'Anti Social Robot Club': 'Gs5g8mpcz3iHUXCcHM8xMkWCdxf4Eq16PbknuWvoVToJ'
 }
