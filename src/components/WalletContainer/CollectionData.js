@@ -66,5 +66,8 @@ export const CollectionToUpdateAuthority = {
     'EitBit Apes': 'JCYqzeqxbQ8TtrJNifUoyYEdRXZZqDUWxqA1WQtQuSGa',
     'Solarmy 2D': '2XsuasXvCDpc9grH6A3WnthLH8p1oCUZcbsfNDTWSqY3',
     'Solarmy 3D': '4Nb8q8kWDJhApURK7jYbvHJvx1njRH2seZibMwf9tTv4',
-    'Anti Social Robot Club': 'Gs5g8mpcz3iHUXCcHM8xMkWCdxf4Eq16PbknuWvoVToJ'
+    'Anti Social Robot Club': 'Gs5g8mpcz3iHUXCcHM8xMkWCdxf4Eq16PbknuWvoVToJ',
+    'BitBoat': 'EJRueK8rmjVy228ydixUJ5ACwz5PHeToTvgZKhYQxHqZ',
+    'Fast Food TB': 'BGDcShiRjGSZR1tKEaSpuoB9GqtfH1cYZ3dpP6fSbGvY',
+    'Solana Surfers': '4VWfqrTeGgt6UjHgSEG5Wp3yoVgwHBAXDRf98rz2C5a7'
 }
