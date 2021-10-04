@@ -84,7 +84,7 @@ class Wallet extends Component {
 
             this.setState({
                 isLoading: false,
-                nftMetadata: metadata
+                nftMetadata: metadata.sort((a, b) => (a.updateAuthority).localeCompare(b.updateAuthority))
             })
         }
     }
