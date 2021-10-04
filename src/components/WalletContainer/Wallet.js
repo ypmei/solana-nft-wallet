@@ -77,7 +77,9 @@ class Wallet extends Component {
                     currentWallet: wallet
                 })
                 let nftMetadata = await loadWallet(wallet, this.totalCountCallback, this.currentCountCallback)
-                metadata.push(...nftMetadata)
+                if (nftMetadata) {
+                    metadata.push(...nftMetadata)
+                }
             }
 
             this.setState({
@@ -147,6 +149,7 @@ class Wallet extends Component {
                         <div className="text-base text-center py-3 w-3/4 mx-auto">
                             <p> Enter in a Wallet address to view its NFTs + calculate total Wallet value from floor
                                 prices.</p>
+                            <p> View multiple wallets together by combining addresses with a '+'</p>
                         </div>
                         : null}
                 </div>
