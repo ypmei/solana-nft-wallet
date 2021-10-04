@@ -25,24 +25,28 @@ export async function loadWallet(walletAddress) {
 
     let nftMetadata = []
     for (let token of nonFungibleTokens) {
-        const mintAddress = toPublicKey(token.account.data.parsed.info.mint)
+        try {
+            const mintAddress = toPublicKey(token.account.data.parsed.info.mint)
 
-        const seeds = [Buffer.from(SEED), toPublicKey(METADATA_PROGRAM_ID).toBuffer(), (mintAddress).toBuffer()]
-        const pdaAccount = await findProgramAddress(seeds, toPublicKey(METADATA_PROGRAM_ID))
+            const seeds = [Buffer.from(SEED), toPublicKey(METADATA_PROGRAM_ID).toBuffer(), (mintAddress).toBuffer()]
+            const pdaAccount = await findProgramAddress(seeds, toPublicKey(METADATA_PROGRAM_ID))
 
-        const pdaAccountInfo = (await connection.getParsedAccountInfo(pdaAccount))
-        const pdaAccountData = pdaAccountInfo.value.data
+            const pdaAccountInfo = (await connection.getParsedAccountInfo(pdaAccount))
+            const pdaAccountData = pdaAccountInfo.value.data
 
-        const metadata = new Metadata(deserializeUnchecked(
-            METADATA_SCHEMA,
-            Metadata,
-            pdaAccountData,
-        ));
+            const metadata = new Metadata(deserializeUnchecked(
+                METADATA_SCHEMA,
+                Metadata,
+                pdaAccountData,
+            ));
 
-        // Add URI JSON to metadata
-        metadata["uriJSON"] = await getJSONFromURI(metadata.data.uri)
+            // Add URI JSON to metadata
+            metadata["uriJSON"] = await getJSONFromURI(metadata.data.uri)
 
-        nftMetadata.push(metadata)
+            nftMetadata.push(metadata)
+        } catch (e) {
+            console.log(e)
+        }
     }
 
     return nftMetadata.sort((a, b) => (a.updateAuthority).localeCompare(b.updateAuthority))
