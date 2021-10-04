@@ -6,7 +6,7 @@ const SEED = "metadata"
 const METADATA_PROGRAM_ID = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
 const SOLANA_TOKEN_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
 
-export async function loadWallet(walletAddress) {
+export async function loadWallet(walletAddress, totalCountCallback, currentCountCallback) {
     const connection = new Connection(clusterApiUrl('mainnet-beta'))
     var walletPK = ""
 
@@ -23,9 +23,14 @@ export async function loadWallet(walletAddress) {
     // Filter tokens by decimal and value
     const nonFungibleTokens = tokens.filter(token => token.account.data.parsed.info.tokenAmount.amount === "1" && token.account.data.parsed.info.tokenAmount.decimals === 0)
 
+    totalCountCallback(nonFungibleTokens.length)
+
     let nftMetadata = []
+    let count = 0
     for (let token of nonFungibleTokens) {
         try {
+            count++;
+            currentCountCallback(count);
             const mintAddress = toPublicKey(token.account.data.parsed.info.mint)
 
             const seeds = [Buffer.from(SEED), toPublicKey(METADATA_PROGRAM_ID).toBuffer(), (mintAddress).toBuffer()]

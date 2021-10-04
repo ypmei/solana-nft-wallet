@@ -11,28 +11,25 @@ class Wallet extends Component {
             walletAddress: "",
             isLoading: false,
             nftMetadata: null,
-            floorData: null
+            floorData: null,
+            currentWallet: null,
+            totalNFTCount: null,
+            currentNFTCount: 0
         }
 
 
         this.handleChange = this.handleChange.bind(this)
         this.getNFTs = this.getNFTs.bind(this)
         this.calculateTotalFloorValue = this.calculateTotalFloorValue.bind(this)
-
-        // this.getNFTFloorData()
+        this.totalCountCallback = this.totalCountCallback.bind(this)
+        this.currentCountCallback = this.currentCountCallback.bind(this)
+        this.loadWalletAddress = this.loadWalletAddress.bind(this)
     }
 
     componentDidMount() {
         let walletAddress = this.props.match.params.walletAddress;
         if (walletAddress) {
-            this.setState({
-                walletAddress: walletAddress
-            }, () => {
-                if (this.state.floorData === null) {
-                    this.getNFTFloorData()
-                }
-                this.getNFTs()
-            })
+            this.loadWalletAddress(walletAddress)
         }
     }
 
@@ -40,28 +37,21 @@ class Wallet extends Component {
         let walletAddress = this.props.match.params.walletAddress
 
         if (walletAddress !== this.state.walletAddress && walletAddress !== undefined && walletAddress.length > 0) {
-            this.setState({
-                walletAddress: walletAddress
-            }, () => {
-                if (this.state.floorData === null) {
-                    this.getNFTFloorData()
-                }
-                this.getNFTs()
-            })
+            this.loadWalletAddress(walletAddress)
         }
-        // if (this.state.walletAddress !== this.props.match.params.walletAddress) {
-        //     let walletAddress = this.props.match.params.walletAddress;
-        //     if (walletAddress !== this.state.walletAddress) {
-        //         this.setState({
-        //             walletAddress: this.props.walletAddress
-        //         }, () => {
-        //             this.getNFTs()
-        //             if (this.state.floorData === null) {
-        //                 this.getNFTFloorData()
-        //             }
-        //         })
-        //     }
-        // }
+    }
+
+    loadWalletAddress(walletAddress) {
+        this.setState({
+            walletAddress: walletAddress,
+            totalNFTCount: null,
+            currentNFTCount: 0,
+        }, () => {
+            if (this.state.floorData === null) {
+                this.getNFTFloorData()
+            }
+            this.getNFTs()
+        })
     }
 
     async getNFTFloorData() {
@@ -80,16 +70,33 @@ class Wallet extends Component {
                 isLoading: true,
                 nftMetadata: null
             })
-            let nftMetadata = await loadWallet(this.state.walletAddress)
+            const wallets = this.state.walletAddress.split("+")
+            let metadata = []
+            for (const wallet of wallets) {
+                this.setState({
+                    currentWallet: wallet
+                })
+                let nftMetadata = await loadWallet(wallet, this.totalCountCallback, this.currentCountCallback)
+                metadata.push(...nftMetadata)
+            }
+
             this.setState({
                 isLoading: false,
-                nftMetadata: nftMetadata
+                nftMetadata: metadata
             })
         }
     }
 
-    handleChange(e) {
-        this.setState({inputWalletAddress: e.target.value});
+    totalCountCallback(count) {
+        this.setState({
+            totalNFTCount: count
+        })
+    }
+
+    currentCountCallback(count) {
+        this.setState({
+            currentNFTCount: count
+        })
     }
 
     calculateTotalFloorValue() {
@@ -102,17 +109,24 @@ class Wallet extends Component {
         return Math.round(totalFloorPrice * 10) / 10
     }
 
+    handleChange(e) {
+        this.setState({inputWalletAddress: e.target.value});
+    }
+
 
     render() {
         return (
 
             <div className={"text-center sm:text-left container mx-auto px-4 py-4 font-main"}>
                 <div className="pt-4 flex justify-between">
-                    <p className={"text-2xl font-bold my-auto"} onClick={() => this.props.history.push("/")}>Solana NFT Wallet Explorer</p>
+                    <p className={"text-2xl font-bold my-auto"} onClick={() => this.props.history.push("/")}>Solana NFT
+                        Wallet Explorer</p>
                     <div className="mt-5 text-left">
                         <p className={"text-gray-500 text-base"}>Sol Tip Jar:
                             EfJeswRanMNzkkLxZN7d9WL5sbm5Z9qfi3EDazZUUCCW</p>
-                        <p className="text-gray-500">Made by: <a className="text-gray-700 hover:text-gray-900 text-right" target="_blank" href="https://twitter.com/avinashj_">@avinashj_</a></p>
+                        <p className="text-gray-500">Made by: <a
+                            className="text-gray-700 hover:text-gray-900 text-right" target="_blank"
+                            href="https://twitter.com/avinashj_">@avinashj_</a></p>
                     </div>
 
                 </div>
@@ -131,14 +145,15 @@ class Wallet extends Component {
                     </div>
                     {this.state.walletAddress === "" ?
                         <div className="text-base text-center py-3 w-3/4 mx-auto">
-                            <p> Enter in a Wallet address to view its NFTs + calculate total Wallet value from floor prices.</p>
+                            <p> Enter in a Wallet address to view its NFTs + calculate total Wallet value from floor
+                                prices.</p>
                         </div>
-                    : null}
+                        : null}
                 </div>
                 {this.state.walletAddress.length > 0 && this.state.nftMetadata !== null ?
                     <div>
                         <p className={"text-3xl py-3 font-bold"}>Wallet Address: <span
-                            className={"font-normal text-2xl"}>{this.state.walletAddress}</span></p>
+                            className={"font-normal text-2xl"}>{this.state.walletAddress.split("+").join(", ")}</span></p>
                         {this.state.nftMetadata.length !== 0 && this.state.floorData ?
                             <div>
                                 <p className={"text-2xl font-bold"}>Total Floor Value: <span
@@ -167,7 +182,8 @@ class Wallet extends Component {
                                 </g>
                             </g>
                         </svg>
-                        Loading NFTs... </p> :
+                        {this.state.totalNFTCount ? <p>{"Wallet Address: " + this.state.currentWallet } <br/> {"Found " + this.state.totalNFTCount + " NFTs, loading " + this.state.currentNFTCount + " / " + this.state.totalNFTCount + " metadata..." }</p> :
+                            "Loading NFTs..."} </p> :
                     <p></p> : this.state.nftMetadata.length === 0 ?
                     <p> No NFTs found! Go buy some on Solanart / DigitalEyes - #WAGMI</p> :
                     <div className="grid grid-cols-2 md:grid-cols-6 gap-4 pt-3">
