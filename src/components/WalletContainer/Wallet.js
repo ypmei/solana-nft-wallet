@@ -200,7 +200,7 @@ class Wallet extends Component {
                                 </g>
                             </g>
                         </svg>
-                        {this.state.totalNFTCount ? <p>{"Wallet Address: " + this.state.currentWallet } <br/> {"Found " + this.state.totalNFTCount + " NFTs, loading " + this.state.currentNFTCount + " / " + this.state.totalNFTCount + " metadata..." }</p> :
+                        {this.state.totalNFTCount ? <p>{"Wallet Address: " + this.state.currentWallet } <br/> {"Found " + this.state.totalNFTCount + " NFTs, loading " + this.state.currentNFTCount + " / " + this.state.totalNFTCount + " metadata..." } <br/> Loading the first time is slow due to caching...</p> :
                             "Loading NFTs..."} </p> :
                     <p></p> : this.state.nftMetadata.length === 0 ?
                     <p> No NFTs found! Go buy some on Solanart / DigitalEyes - #WAGMI</p> :

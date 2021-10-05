@@ -1,6 +1,8 @@
 import {clusterApiUrl, Connection, PublicKey} from "@solana/web3.js";
 import {deserializeUnchecked} from "borsh";
 import {Metadata, METADATA_SCHEMA} from "./Metadata";
+import {firestore} from "./LoadFloorData";
+import {serverTimestamp} from "@firebase/firestore";
 
 const SEED = "metadata"
 const METADATA_PROGRAM_ID = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
@@ -22,33 +24,57 @@ export async function loadWallet(walletAddress, totalCountCallback, currentCount
 
     // Filter tokens by decimal and value
     const nonFungibleTokens = tokens.filter(token => token.account.data.parsed.info.tokenAmount.amount === "1" && token.account.data.parsed.info.tokenAmount.decimals === 0)
-
     totalCountCallback(nonFungibleTokens.length)
 
     let nftMetadata = []
     let count = 0
+
+    // Check to see if this is the first time seeing this wallet
+    var doc = await firestore.doc('wallets/'+walletAddress).get()
+    let seenWallet = true;
+    if (!doc.exists) {
+        // If this is the first time seeing this wallet, we want to load every NFT from the API and save this wallet address to Firebase
+        await firestore.doc('wallets/'+walletAddress).set({'lastAccessed': serverTimestamp()})
+        seenWallet = false;
+    }
+
     for (let token of nonFungibleTokens) {
         try {
             count++;
             currentCountCallback(count);
             const mintAddress = toPublicKey(token.account.data.parsed.info.mint)
 
-            const seeds = [Buffer.from(SEED), toPublicKey(METADATA_PROGRAM_ID).toBuffer(), (mintAddress).toBuffer()]
-            const pdaAccount = await findProgramAddress(seeds, toPublicKey(METADATA_PROGRAM_ID))
+            // If we're supposed to check Firebase (only on seen wallets), attempt to load metadata
+            if (seenWallet) {
+                doc = await firestore.doc('metadata/' + mintAddress.toString()).get()
+            }
 
-            const pdaAccountInfo = (await connection.getParsedAccountInfo(pdaAccount))
-            const pdaAccountData = pdaAccountInfo.value.data
+            // If we're not supposed to check Firebase OR the document from firebase doesn't exist, ping the API
+            if (!seenWallet || !doc.exists) {
+                const seeds = [Buffer.from(SEED), toPublicKey(METADATA_PROGRAM_ID).toBuffer(), (mintAddress).toBuffer()]
+                const pdaAccount = await findProgramAddress(seeds, toPublicKey(METADATA_PROGRAM_ID))
+                const pdaAccountInfo = (await connection.getParsedAccountInfo(pdaAccount))
+                const pdaAccountData = pdaAccountInfo.value.data
 
-            const metadata = new Metadata(deserializeUnchecked(
-                METADATA_SCHEMA,
-                Metadata,
-                pdaAccountData,
-            ));
+                const metadata = new Metadata(deserializeUnchecked(
+                    METADATA_SCHEMA,
+                    Metadata,
+                    pdaAccountData,
+                ));
 
-            // Add URI JSON to metadata
-            metadata["uriJSON"] = await getJSONFromURI(metadata.data.uri)
+                // Add URI JSON to metadata
+                metadata["uriJSON"] = await getJSONFromURI(metadata.data.uri)
 
-            nftMetadata.push(metadata)
+                // Update Firebase with this NFT + metadata
+                firestore.doc('metadata/'+mintAddress.toString()).set({"metadata":JSON.stringify(metadata)})
+
+                // Push metadata
+                nftMetadata.push(metadata)
+            } else {
+                // Push metadata
+                nftMetadata.push(JSON.parse(doc.data()['metadata']));
+            }
+
         } catch (e) {
             console.log(e)
         }
