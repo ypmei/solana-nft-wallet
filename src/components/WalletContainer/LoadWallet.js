@@ -9,8 +9,7 @@ const METADATA_PROGRAM_ID = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
 const SOLANA_TOKEN_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
 
 export async function loadWallet(walletAddress, totalCountCallback, currentCountCallback) {
-    const connection = new Connection("https://free.rpcpool.com")
-
+    const connection = new Connection("https://dark-summer-dew.solana-mainnet.quiknode.pro/431dccc44f65b6985822f912053640645ae71683/")
 
     var walletPK = ""
 
