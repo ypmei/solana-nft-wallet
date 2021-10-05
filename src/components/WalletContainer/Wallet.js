@@ -135,11 +135,11 @@ class Wallet extends Component {
         return (
 
             <div className={"text-center sm:text-left container mx-auto px-4 py-4 font-main"}>
-                <div className="pt-4 flex justify-between">
-                    <p className={"text-2xl font-bold my-auto"} onClick={() => this.props.history.push("/")}>Solana NFT
+                <div className="pt-4 flex-col md:flex justify-between">
+                    <p className={"text-2xl font-bold my-auto flex-grow-0 mr-3"} onClick={() => this.props.history.push("/")}>Solana NFT
                         Wallet Explorer</p>
                     <div className="mt-5 text-left">
-                        <p className={"text-gray-500 text-base"}>Sol Tip Jar:
+                        <p className={"text-gray-500 text-base break-words"}>Sol Tip Jar:
                             EfJeswRanMNzkkLxZN7d9WL5sbm5Z9qfi3EDazZUUCCW</p>
                         <p className="text-gray-500">Made by: <a
                             className="text-gray-700 hover:text-gray-900 text-right" target="_blank"
