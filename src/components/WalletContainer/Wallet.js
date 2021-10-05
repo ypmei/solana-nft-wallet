@@ -135,8 +135,8 @@ class Wallet extends Component {
         return (
 
             <div className={"text-center sm:text-left container mx-auto px-4 py-4 font-main"}>
-                <div className="pt-4 flex-col md:flex justify-between">
-                    <p className={"text-2xl font-bold my-auto flex-grow-0 mr-3"} onClick={() => this.props.history.push("/")}>Solana NFT
+                <div className="pt-4 flex flex-col md:flex-row px-4 justify-between">
+                    <p className={"text-2xl font-bold text-left my-auto flex-grow-0 md:mr-3"} onClick={() => this.props.history.push("/")}>Solana NFT
                         Wallet Explorer</p>
                     <div className="mt-5 text-left">
                         <p className={"text-gray-500 text-base break-words"}>Sol Tip Jar:
@@ -161,9 +161,9 @@ class Wallet extends Component {
                         </div>
                     </div>
                     {this.state.walletAddress === "" ?
-                        <div className="text-base text-center py-3 w-3/4 mx-auto">
+                        <div className="text-base text-center py-3 w-5/6 mx-auto">
                             <p> Enter in a Wallet address to view its NFTs + calculate total Wallet value from floor
-                                prices.</p>
+                                prices.</p> <br/>
                             <p> View multiple wallets together by combining addresses with a '+'</p>
                         </div>
                         : null}
