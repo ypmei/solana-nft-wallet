@@ -26,6 +26,7 @@ export async function loadWallet(walletAddress, totalCountCallback, currentCount
     const nonFungibleTokens = tokens.filter(token => token.account.data.parsed.info.tokenAmount.amount === "1" && token.account.data.parsed.info.tokenAmount.decimals === 0)
     totalCountCallback(nonFungibleTokens.length)
 
+    let uploadToFirebase = {}
     let nftMetadata = []
     let count = 0
 
@@ -45,12 +46,15 @@ export async function loadWallet(walletAddress, totalCountCallback, currentCount
             const mintAddress = toPublicKey(token.account.data.parsed.info.mint)
 
             // If we're supposed to check Firebase (only on seen wallets), attempt to load metadata
+            let metadataInFirebase = false;
             if (seenWallet) {
-                doc = await firestore.doc('metadata/' + mintAddress.toString()).get()
+                if (doc.data()[mintAddress.toString()]) {
+                    metadataInFirebase = true;
+                }
             }
 
             // If we're not supposed to check Firebase OR the document from firebase doesn't exist, ping the API
-            if (!seenWallet || !doc.exists) {
+            if (!seenWallet || !metadataInFirebase) {
                 const seeds = [Buffer.from(SEED), toPublicKey(METADATA_PROGRAM_ID).toBuffer(), (mintAddress).toBuffer()]
                 const pdaAccount = await findProgramAddress(seeds, toPublicKey(METADATA_PROGRAM_ID))
                 const pdaAccountInfo = (await connection.getParsedAccountInfo(pdaAccount))
@@ -66,18 +70,23 @@ export async function loadWallet(walletAddress, totalCountCallback, currentCount
                 metadata["uriJSON"] = await getJSONFromURI(metadata.data.uri)
 
                 // Update Firebase with this NFT + metadata
-                firestore.doc('metadata/'+mintAddress.toString()).set({"metadata":JSON.stringify(metadata)})
+                uploadToFirebase[mintAddress.toString()] = JSON.stringify(metadata)
+                // firestore.doc('metadata/'+mintAddress.toString()).set({"metadata":JSON.stringify(metadata)})
 
                 // Push metadata
                 nftMetadata.push(metadata)
             } else {
                 // Push metadata
-                nftMetadata.push(JSON.parse(doc.data()['metadata']));
+                nftMetadata.push(JSON.parse(doc.data()[mintAddress.toString()]));
             }
 
         } catch (e) {
             console.log(e)
         }
+    }
+
+    if (Object.keys(uploadToFirebase).length > 0) {
+        firestore.doc('wallets/'+walletAddress).update(uploadToFirebase)
     }
 
     return nftMetadata.sort((a, b) => (a.updateAuthority).localeCompare(b.updateAuthority))
