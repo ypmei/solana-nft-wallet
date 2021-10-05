@@ -9,7 +9,9 @@ const METADATA_PROGRAM_ID = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
 const SOLANA_TOKEN_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
 
 export async function loadWallet(walletAddress, totalCountCallback, currentCountCallback) {
-    const connection = new Connection("https://api.mainnet-beta.solana.com")
+    const connection = new Connection("https://free.rpcpool.com")
+
+
     var walletPK = ""
 
     try {
