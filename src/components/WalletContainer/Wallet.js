@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {loadWallet} from "./LoadWallet";
-import {loadFloorData} from "./LoadFloorData";
+import {loadFloorData, loadSolanaPrice} from "./LoadFloorData";
 
 class Wallet extends Component {
     constructor() {
@@ -24,6 +24,7 @@ class Wallet extends Component {
         this.totalCountCallback = this.totalCountCallback.bind(this)
         this.currentCountCallback = this.currentCountCallback.bind(this)
         this.loadWalletAddress = this.loadWalletAddress.bind(this)
+        this.solanaPriceCallback = this.solanaPriceCallback.bind(this)
     }
 
     componentDidMount() {
@@ -31,6 +32,8 @@ class Wallet extends Component {
         if (walletAddress) {
             this.loadWalletAddress(walletAddress)
         }
+
+        loadSolanaPrice(this.solanaPriceCallback)
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -101,6 +104,12 @@ class Wallet extends Component {
         })
     }
 
+    solanaPriceCallback(price) {
+        this.setState({
+            currentSolanaPrice: price
+        })
+    }
+
     calculateTotalFloorValue() {
         var totalFloorPrice = 0.0
         for (let nft of this.state.nftMetadata) {
@@ -117,6 +126,12 @@ class Wallet extends Component {
 
 
     render() {
+        var usdFormatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+
+            maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+        });
         return (
 
             <div className={"text-center sm:text-left container mx-auto px-4 py-4 font-main"}>
@@ -160,7 +175,7 @@ class Wallet extends Component {
                         {this.state.nftMetadata.length !== 0 && this.state.floorData ?
                             <div>
                                 <p className={"text-2xl font-bold"}>Total Floor Value: <span
-                                    className={"font-normal"}>{this.calculateTotalFloorValue() + "◎"}</span></p>
+                                    className={"font-normal"}>{this.calculateTotalFloorValue() + "◎"} <span className="text-gray-500 text-xl">{ "(" + usdFormatter.format(this.calculateTotalFloorValue() * this.state.currentSolanaPrice)+")"}</span></span></p>
                                 <p className={"text-gray-500 pb-3 text-base"}>Floor prices updated every hour. Last
                                     updated: {this.state.floorLastUpdated}</p>
                                 {/*<p className={"text-gray-500 pb-3 text-base"}>Add more NFT collections to our API <a>here</a>.</p>*/}
