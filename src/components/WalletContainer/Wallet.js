@@ -29,6 +29,9 @@ class Wallet extends Component {
 
     componentDidMount() {
         let walletAddress = this.props.match.params.walletAddress;
+        if (window.location.hostname.indexOf('solana-nft-wallet') !== -1) {
+            window.location.replace("https://zookeeper.club/"+(walletAddress ? walletAddress : ""));
+        }
         if (walletAddress) {
             this.loadWalletAddress(walletAddress)
         }
@@ -136,8 +139,7 @@ class Wallet extends Component {
 
             <div className={"text-center sm:text-left container mx-auto px-4 py-4 font-main"}>
                 <div className="pt-4 flex flex-col md:flex-row px-4 justify-between">
-                    <p className={"text-2xl font-bold text-left my-auto flex-grow-0 md:mr-3"} onClick={() => this.props.history.push("/")}>Solana NFT
-                        Wallet Explorer</p>
+                    <p className={"text-2xl font-bold text-left my-auto flex-grow-0 md:mr-3"} onClick={() => this.props.history.push("/")}>ZooKeeper</p>
                     <div className="mt-5 text-left">
                         <p className={"text-gray-500 text-base break-words"}>Sol Tip Jar:
                             EfJeswRanMNzkkLxZN7d9WL5sbm5Z9qfi3EDazZUUCCW</p>
