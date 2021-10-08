@@ -1,6 +1,13 @@
 import React, {Component} from 'react';
 import {loadWallet} from "./LoadWallet";
 import {loadFloorData, loadSolanaPrice} from "./LoadFloorData";
+import Dropdown from 'react-dropdown';
+import { Menu, Transition } from '@headlessui/react'
+
+
+const options = [
+    "Floor Price (High to Low)", "Floor Price (Low to High)","Name (A-Z)", "Name (Z-A)"
+];
 
 class Wallet extends Component {
     constructor() {
@@ -14,7 +21,8 @@ class Wallet extends Component {
             floorData: null,
             currentWallet: null,
             totalNFTCount: null,
-            currentNFTCount: 0
+            currentNFTCount: 0,
+            sortSelectedOption: null,
         }
 
 
@@ -25,6 +33,7 @@ class Wallet extends Component {
         this.currentCountCallback = this.currentCountCallback.bind(this)
         this.loadWalletAddress = this.loadWalletAddress.bind(this)
         this.solanaPriceCallback = this.solanaPriceCallback.bind(this)
+        this.handleSortSelectChange = this.handleSortSelectChange.bind(this)
     }
 
     componentDidMount() {
@@ -127,6 +136,116 @@ class Wallet extends Component {
         this.setState({inputWalletAddress: e.target.value});
     }
 
+    handleSortSelectChange(sortSelectedOption) {
+        this.setState({ sortSelectedOption });
+    }
+
+    sortDropdown() {
+        return (
+            <div className="flex items-center justify-end py-2">
+                <div className="relative inline-block text-left">
+                    <Menu>
+                        {({ open }) => (
+                            <>
+              <span className="rounded-md shadow-sm">
+                <Menu.Button className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium leading-5 text-gray-700 transition duration-150 ease-in-out bg-white border border-gray-300 rounded-md hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-50 active:text-gray-800">
+                  <span>Sort By</span>
+                  <svg
+                      className="w-5 h-5 ml-2 -mr-1"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                  >
+                    <path
+                        fillRule="evenodd"
+                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                    />
+                  </svg>
+                </Menu.Button>
+              </span>
+
+                                <Transition
+                                    show={open}
+                                    enter="transition ease-out duration-100"
+                                    enterFrom="transform opacity-0 scale-95"
+                                    enterTo="transform opacity-100 scale-100"
+                                    leave="transition ease-in duration-75"
+                                    leaveFrom="transform opacity-100 scale-100"
+                                    leaveTo="transform opacity-0 scale-95"
+                                >
+                                    <Menu.Items
+                                        static
+                                        className="absolute right-0 w-56 mt-2 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg outline-none"
+                                    >
+
+                                        <div className="py-1">
+                                            <Menu.Item>
+                                                {({ active }) => (
+                                                    <a
+                                                        href="#account-settings"
+                                                        className={`${
+                                                            active
+                                                                ? "bg-gray-100 text-gray-900"
+                                                                : "text-gray-700"
+                                                        } flex justify-between w-full px-4 py-2 text-sm leading-5 text-left`}
+                                                    >
+                                                        Floor Price (High to Low)
+                                                    </a>
+                                                )}
+                                            </Menu.Item>
+                                            <Menu.Item>
+                                                {({ active }) => (
+                                                    <a
+                                                        href="#support"
+                                                        className={`${
+                                                            active
+                                                                ? "bg-gray-100 text-gray-900"
+                                                                : "text-gray-700"
+                                                        } flex justify-between w-full px-4 py-2 text-sm leading-5 text-left`}
+                                                    >
+                                                        Floor Price (Low to High)
+                                                    </a>
+                                                )}
+                                            </Menu.Item>
+                                            <Menu.Item>
+                                                {({ active }) => (
+                                                    <a
+                                                        href="#license"
+                                                        className={`${
+                                                            active
+                                                                ? "bg-gray-100 text-gray-900"
+                                                                : "text-gray-700"
+                                                        } flex justify-between w-full px-4 py-2 text-sm leading-5 text-left`}
+                                                    >
+                                                        NFT Name (A-Z)
+                                                    </a>
+                                                )}
+                                            </Menu.Item>
+                                            <Menu.Item>
+                                                {({ active }) => (
+                                                    <a
+                                                        href="#sign-out"
+                                                        className={`${
+                                                            active
+                                                                ? "bg-gray-100 text-gray-900"
+                                                                : "text-gray-700"
+                                                        } flex justify-between w-full px-4 py-2 text-sm leading-5 text-left`}
+                                                    >
+                                                        NFT Name (Z-A)
+                                                    </a>
+                                                )}
+                                            </Menu.Item>
+                                        </div>
+                                    </Menu.Items>
+                                </Transition>
+                            </>
+                        )}
+                    </Menu>
+                </div>
+            </div>
+        )
+    }
+
 
     render() {
         var usdFormatter = new Intl.NumberFormat('en-US', {
@@ -206,6 +325,10 @@ class Wallet extends Component {
                             "Loading NFTs..."} </p> :
                     <p></p> : this.state.nftMetadata.length === 0 ?
                     <p> No NFTs found! Go buy some on Solanart / DigitalEyes - #WAGMI</p> :
+                    <div>
+                      <div>
+                          {this.sortDropdown()}
+                      </div>
                     <div className="grid grid-cols-2 md:grid-cols-6 gap-4 pt-3">
                         {this.state.nftMetadata.map((metadata, i) =>
                             <div key={i} className={"text-center"}>
@@ -218,6 +341,7 @@ class Wallet extends Component {
                             </div>
                         )}
 
+                    </div>
                     </div>
                 }
             </div>

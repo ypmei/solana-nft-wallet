@@ -3,19 +3,28 @@ import {deserializeUnchecked} from "borsh";
 import {Metadata, METADATA_SCHEMA} from "./Metadata";
 import {firestore} from "./LoadFloorData";
 import {serverTimestamp} from "@firebase/firestore";
+import {NameRegistryState} from "@solana/spl-name-service";
+import {getDomainOwner, getInputKey} from "./loadSolDomainAddress";
 
 const SEED = "metadata"
 const METADATA_PROGRAM_ID = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
 const SOLANA_TOKEN_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
 
 export async function loadWallet(walletAddress, totalCountCallback, currentCountCallback) {
-    const connection = new Connection("https://dark-summer-dew.solana-mainnet.quiknode.pro/431dccc44f65b6985822f912053640645ae71683/")
+    // const connection = new Connection("https://dark-summer-dew.solana-mainnet.quiknode.pro/431dccc44f65b6985822f912053640645ae71683/")
+    const connection = new Connection(clusterApiUrl("mainnet-beta"))
 
     var walletPK = ""
 
     try {
-        walletPK = toPublicKey(walletAddress)
-    } catch {
+        if (walletAddress.slice(walletAddress.length - 4) === ".sol") {
+
+            walletPK = await getDomainOwner(walletAddress, connection)
+        } else {
+            walletPK = toPublicKey(walletAddress)
+        }
+    } catch (e) {
+        console.log(e)
         alert("Couldn't find wallet at that address. Please enter a valid wallet address.")
         return null;
     }
