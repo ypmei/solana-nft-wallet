@@ -137,7 +137,27 @@ class Wallet extends Component {
     }
 
     handleSortSelectChange(sortSelectedOption) {
-        this.setState({ sortSelectedOption });
+        if (sortSelectedOption === 0) {
+            this.setState({
+                nftMetadata: this.state.nftMetadata.sort((a, b) => (this.state.floorData[b.updateAuthority] ?? 0) - (this.state.floorData[a.updateAuthority] ?? 0))
+            })
+        } else if (sortSelectedOption === 1) {
+            this.setState({
+                nftMetadata: this.state.nftMetadata.sort((a, b) => (this.state.floorData[a.updateAuthority] ?? 0) - (this.state.floorData[b.updateAuthority] ?? 0))
+            })
+        } else if (sortSelectedOption === 2) {
+            this.setState({
+                nftMetadata: this.state.nftMetadata.sort((a,b) => a.uriJSON.name.localeCompare(b.uriJSON.name))
+            })
+        } else if (sortSelectedOption === 3) {
+            this.setState({
+                nftMetadata: this.state.nftMetadata.sort((a,b) => b.uriJSON.name.localeCompare(a.uriJSON.name))
+            })
+        } else if (sortSelectedOption === 4) {
+            this.setState({
+                nftMetadata: this.state.nftMetadata.sort((a,b) => b.updateAuthority.localeCompare(a.updateAuthority))
+            })
+        }
     }
 
     sortDropdown() {
@@ -178,11 +198,11 @@ class Wallet extends Component {
                                         className="absolute right-0 w-56 mt-2 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg outline-none"
                                     >
 
-                                        <div className="py-1">
+                                        <div className="py-1 cursor-pointer">
                                             <Menu.Item>
                                                 {({ active }) => (
                                                     <a
-                                                        href="#account-settings"
+                                                        onClick={() => this.handleSortSelectChange(0)}
                                                         className={`${
                                                             active
                                                                 ? "bg-gray-100 text-gray-900"
@@ -196,7 +216,7 @@ class Wallet extends Component {
                                             <Menu.Item>
                                                 {({ active }) => (
                                                     <a
-                                                        href="#support"
+                                                        onClick={() => this.handleSortSelectChange(1)}
                                                         className={`${
                                                             active
                                                                 ? "bg-gray-100 text-gray-900"
@@ -210,7 +230,7 @@ class Wallet extends Component {
                                             <Menu.Item>
                                                 {({ active }) => (
                                                     <a
-                                                        href="#license"
+                                                        onClick={() => this.handleSortSelectChange(2)}
                                                         className={`${
                                                             active
                                                                 ? "bg-gray-100 text-gray-900"
@@ -224,7 +244,7 @@ class Wallet extends Component {
                                             <Menu.Item>
                                                 {({ active }) => (
                                                     <a
-                                                        href="#sign-out"
+                                                        onClick={() => this.handleSortSelectChange(3)}
                                                         className={`${
                                                             active
                                                                 ? "bg-gray-100 text-gray-900"
@@ -232,6 +252,20 @@ class Wallet extends Component {
                                                         } flex justify-between w-full px-4 py-2 text-sm leading-5 text-left`}
                                                     >
                                                         NFT Name (Z-A)
+                                                    </a>
+                                                )}
+                                            </Menu.Item>
+                                            <Menu.Item>
+                                                {({ active }) => (
+                                                    <a
+                                                        onClick={() => this.handleSortSelectChange(4)}
+                                                        className={`${
+                                                            active
+                                                                ? "bg-gray-100 text-gray-900"
+                                                                : "text-gray-700"
+                                                        } flex justify-between w-full px-4 py-2 text-sm leading-5 text-left`}
+                                                    >
+                                                        Collection Name
                                                     </a>
                                                 )}
                                             </Menu.Item>
