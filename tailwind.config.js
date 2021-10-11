@@ -3,7 +3,7 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     fontFamily: {
-      'main': ['Open Sans', 'sans-serif']
+      main: ['Open Sans', 'sans-serif'],
     },
     extend: {},
   },
@@ -11,4 +11,4 @@ module.exports = {
     extend: {},
   },
   plugins: [],
-}
+};
