@@ -97,11 +97,10 @@ class Wallet extends Component {
       const wallets = walletAddress.split('+');
       const metadata = [];
       // TODO: optimize
-      if (wallets.length)
-        this.setState({
-          currentWallet: wallets[wallets.length - 1],
-        });
       for (const wallet of wallets) {
+        this.setState({
+          currentWallet: wallet,
+        });
         const nftMetadata = await loadWallet(
           wallet,
           this.totalCountCallback,
