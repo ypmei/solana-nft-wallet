@@ -1,34 +1,29 @@
 import { clusterApiUrl, Connection, PublicKey } from '@solana/web3.js';
 import { deserializeUnchecked } from 'borsh';
 import { serverTimestamp } from '@firebase/firestore';
-import { NameRegistryState } from '@solana/spl-name-service';
+// import { NameRegistryState } from '@solana/spl-name-service';
 import { Metadata, METADATA_SCHEMA } from './Metadata';
 import { firestore } from './LoadFloorData';
-import { getDomainOwner, getInputKey } from './loadSolDomainAddress';
+import { getDomainOwner } from './loadSolDomainAddress';
 
 const SEED = 'metadata';
 const METADATA_PROGRAM_ID = 'metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s';
 const SOLANA_TOKEN_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
 
-export function toPublicKey(key) {
-  return new PublicKey(key);
-}
+export const toPublicKey = (key) => new PublicKey(key);
 
-async function getJSONFromURI(uri) {
-  return fetch(uri)
+const getJSONFromURI = async (uri) =>
+  fetch(uri)
     .then((res) => res.json())
     .then((json) => {
       return json;
     });
-}
 
-export const findProgramAddress = async (seeds, programId) => {
-  const result = await PublicKey.findProgramAddress(seeds, programId);
+// return first program address
+export const findProgramAddress = async (seeds, programId) =>
+  (await PublicKey.findProgramAddress(seeds, programId))[0];
 
-  return result[0];
-};
-
-export async function loadWallet(walletAddress, totalCountCallback, currentCountCallback) {
+export const loadWallet = async (walletAddress, totalCountCallback, currentCountCallback) => {
   // const connection = new Connection("https://dark-summer-dew.solana-mainnet.quiknode.pro/431dccc44f65b6985822f912053640645ae71683/")
   const connection = new Connection(clusterApiUrl('mainnet-beta'));
 
@@ -124,4 +119,4 @@ export async function loadWallet(walletAddress, totalCountCallback, currentCount
   }
 
   return nftMetadata.sort((a, b) => a.updateAuthority.localeCompare(b.updateAuthority));
-}
+};

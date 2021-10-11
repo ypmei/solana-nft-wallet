@@ -2,12 +2,12 @@ import firebase from 'firebase/compat';
 import 'firebase/firestore';
 
 import firebaseConfig from './firebase-config.json';
-import { CollectionToUpdateAuthority } from './CollectionData';
+// import { CollectionToUpdateAuthority } from './CollectionData';
 
 firebase.initializeApp(firebaseConfig);
 export const firestore = firebase.firestore();
 
-export async function loadFloorData() {
+export const loadFloorData = async () => {
   const snapshot = await firestore.doc('api/floor-data').get();
   const data = snapshot.data();
 
@@ -66,11 +66,9 @@ export async function loadFloorData() {
   const lastUpdatedString = `${lastUpdated.toLocaleDateString()} ${lastUpdated.toLocaleTimeString()}`;
 
   return [updateAuthorityToPrice, lastUpdatedString];
-}
+};
 
-export async function loadSolanaPrice(updatePrice) {
-  const url = 'https://api.binance.com/api/v3/ticker/price?symbol=SOLUSDT';
-  fetch(url)
+export const loadSolanaPrice = async (updatePrice) =>
+  fetch('https://api.binance.com/api/v3/ticker/price?symbol=SOLUSDT')
     .then((response) => response.json())
     .then((data) => updatePrice(data.price));
-}

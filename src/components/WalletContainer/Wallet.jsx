@@ -1,15 +1,7 @@
 import { Component } from 'react';
-// import Dropdown from 'react-dropdown';
-import { Menu, Transition } from '@headlessui/react';
 import { loadWallet } from './LoadWallet';
 import { loadFloorData, loadSolanaPrice } from './LoadFloorData';
-
-// const options = [
-//   'Floor Price (High to Low)',
-//   'Floor Price (Low to High)',
-//   'Name (A-Z)',
-//   'Name (Z-A)',
-// ];
+import SortDropdown, { SortFunctions } from './SortDropdown';
 
 class Wallet extends Component {
   constructor() {
@@ -24,16 +16,8 @@ class Wallet extends Component {
       currentWallet: null,
       totalNFTCount: null,
       currentNFTCount: 0,
-      // sortSelectedOption: null,
     };
 
-    this.handleChange = this.handleChange.bind(this);
-    this.getNFTs = this.getNFTs.bind(this);
-    this.calculateTotalFloorValue = this.calculateTotalFloorValue.bind(this);
-    this.totalCountCallback = this.totalCountCallback.bind(this);
-    this.currentCountCallback = this.currentCountCallback.bind(this);
-    this.loadWalletAddress = this.loadWalletAddress.bind(this);
-    this.solanaPriceCallback = this.solanaPriceCallback.bind(this);
     this.handleSortSelectChange = this.handleSortSelectChange.bind(this);
   }
 
@@ -42,6 +26,7 @@ class Wallet extends Component {
     if (window.location.hostname.indexOf('solana-nft-wallet') !== -1) {
       window.location.replace(`https://zookeeper.club/${walletAddress || ''}`);
     }
+    // parameter passed in from URL (i.e. entered address and pressed search)
     if (walletAddress) {
       this.loadWalletAddress(walletAddress);
     }
@@ -61,7 +46,7 @@ class Wallet extends Component {
     }
   }
 
-  loadWalletAddress(walletAddress) {
+  loadWalletAddress = (walletAddress) =>
     this.setState(
       {
         walletAddress,
@@ -75,7 +60,6 @@ class Wallet extends Component {
         this.getNFTs();
       }
     );
-  }
 
   async getNFTFloorData() {
     const floorData = await loadFloorData();
@@ -85,7 +69,7 @@ class Wallet extends Component {
     });
   }
 
-  async getNFTs() {
+  getNFTs = async () => {
     const { walletAddress } = this.state;
     if (walletAddress.length === 0) {
       alert('Please enter a valid Solana wallet address!');
@@ -96,7 +80,6 @@ class Wallet extends Component {
       });
       const wallets = walletAddress.split('+');
       const metadata = [];
-      // TODO: optimize
       for (const wallet of wallets) {
         this.setState({
           currentWallet: wallet,
@@ -116,27 +99,24 @@ class Wallet extends Component {
         nftMetadata: metadata.sort((a, b) => a.updateAuthority.localeCompare(b.updateAuthority)),
       });
     }
-  }
+  };
 
-  totalCountCallback(count) {
+  totalCountCallback = (count) =>
     this.setState({
       totalNFTCount: count,
     });
-  }
 
-  currentCountCallback(count) {
+  currentCountCallback = (count) =>
     this.setState({
       currentNFTCount: count,
     });
-  }
 
-  solanaPriceCallback(price) {
+  solanaPriceCallback = (price) =>
     this.setState({
       currentSolanaPrice: price,
     });
-  }
 
-  calculateTotalFloorValue() {
+  calculateTotalFloorValue = () => {
     let totalFloorPrice = 0.0;
     for (const nft of this.state.nftMetadata) {
       const floorPrice = this.state.floorData[nft.updateAuthority]
@@ -146,144 +126,16 @@ class Wallet extends Component {
       totalFloorPrice += floorPrice;
     }
     return Math.round(totalFloorPrice * 10) / 10;
-  }
+  };
 
-  handleChange(e) {
-    this.setState({ inputWalletAddress: e.target.value });
-  }
+  handleInputChange = (e) => this.setState({ inputWalletAddress: e.target.value });
 
-  handleSortSelectChange(sortSelectedOption) {
-    if (sortSelectedOption === 0) {
-      this.setState(({ nftMetadata, floorData }) => ({
-        nftMetadata: nftMetadata.sort(
-          (a, b) => (floorData[b.updateAuthority] ?? 0) - (floorData[a.updateAuthority] ?? 0)
-        ),
-      }));
-    } else if (sortSelectedOption === 1) {
-      this.setState(({ nftMetadata, floorData }) => ({
-        nftMetadata: nftMetadata.sort(
-          (a, b) => (floorData[a.updateAuthority] ?? 0) - (floorData[b.updateAuthority] ?? 0)
-        ),
-      }));
-    } else if (sortSelectedOption === 2) {
-      this.setState(({ nftMetadata }) => ({
-        nftMetadata: nftMetadata.sort((a, b) => a.uriJSON.name.localeCompare(b.uriJSON.name)),
-      }));
-    } else if (sortSelectedOption === 3) {
-      this.setState(({ nftMetadata }) => ({
-        nftMetadata: nftMetadata.sort((a, b) => b.uriJSON.name.localeCompare(a.uriJSON.name)),
-      }));
-    } else if (sortSelectedOption === 4) {
-      this.setState(({ nftMetadata }) => ({
-        nftMetadata: nftMetadata.sort((a, b) => b.updateAuthority.localeCompare(a.updateAuthority)),
-      }));
-    }
-  }
-
-  sortDropdown() {
-    return (
-      <div className="flex items-center justify-end py-2">
-        <div className="relative inline-block text-left">
-          <Menu>
-            {({ open }) => (
-              <>
-                <span className="rounded-md shadow-sm">
-                  <Menu.Button className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium leading-5 text-gray-700 transition duration-150 ease-in-out bg-white border border-gray-300 rounded-md hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-50 active:text-gray-800">
-                    <span>Sort By</span>
-                    <svg className="w-5 h-5 ml-2 -mr-1" viewBox="0 0 20 20" fill="currentColor">
-                      <path
-                        fillRule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </Menu.Button>
-                </span>
-
-                <Transition
-                  show={open}
-                  enter="transition ease-out duration-100"
-                  enterFrom="transform opacity-0 scale-95"
-                  enterTo="transform opacity-100 scale-100"
-                  leave="transition ease-in duration-75"
-                  leaveFrom="transform opacity-100 scale-100"
-                  leaveTo="transform opacity-0 scale-95"
-                >
-                  <Menu.Items
-                    static
-                    className="absolute right-0 w-56 mt-2 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg outline-none"
-                  >
-                    <div className="py-1 cursor-pointer">
-                      <Menu.Item>
-                        {({ active }) => (
-                          <a
-                            onClick={() => this.handleSortSelectChange(0)}
-                            className={`${
-                              active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
-                            } flex justify-between w-full px-4 py-2 text-sm leading-5 text-left`}
-                          >
-                            Floor Price (High to Low)
-                          </a>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <a
-                            onClick={() => this.handleSortSelectChange(1)}
-                            className={`${
-                              active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
-                            } flex justify-between w-full px-4 py-2 text-sm leading-5 text-left`}
-                          >
-                            Floor Price (Low to High)
-                          </a>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <a
-                            onClick={() => this.handleSortSelectChange(2)}
-                            className={`${
-                              active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
-                            } flex justify-between w-full px-4 py-2 text-sm leading-5 text-left`}
-                          >
-                            NFT Name (A-Z)
-                          </a>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <a
-                            onClick={() => this.handleSortSelectChange(3)}
-                            className={`${
-                              active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
-                            } flex justify-between w-full px-4 py-2 text-sm leading-5 text-left`}
-                          >
-                            NFT Name (Z-A)
-                          </a>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <a
-                            onClick={() => this.handleSortSelectChange(4)}
-                            className={`${
-                              active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
-                            } flex justify-between w-full px-4 py-2 text-sm leading-5 text-left`}
-                          >
-                            Collection Name
-                          </a>
-                        )}
-                      </Menu.Item>
-                    </div>
-                  </Menu.Items>
-                </Transition>
-              </>
-            )}
-          </Menu>
-        </div>
-      </div>
-    );
-  }
+  handleSortSelectChange = (sortSelectedOption) => {
+    const sortFunction = SortFunctions[sortSelectedOption];
+    this.setState((prevState) => ({
+      nftMetadata: sortFunction(prevState),
+    }));
+  };
 
   render() {
     const usdFormatter = new Intl.NumberFormat('en-US', {
@@ -292,6 +144,7 @@ class Wallet extends Component {
 
       maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
     });
+
     return (
       <div className="text-center sm:text-left container mx-auto px-4 py-4 font-main">
         <div className="pt-4 flex flex-col md:flex-row px-4 justify-between">
@@ -322,7 +175,7 @@ class Wallet extends Component {
           <div className="rounded-lg bg-white flex items-center shadow-md">
             <input
               className="w-full py-2 px-6 text-gray-700 leading-tight focus:outline-none"
-              onChange={this.handleChange}
+              onChange={this.handleInputChange}
               id="search"
               type="text"
               placeholder="Enter Solana Wallet Address:"
@@ -338,7 +191,7 @@ class Wallet extends Component {
               </button>
             </div>
           </div>
-          {this.state.walletAddress === '' ? (
+          {this.state.walletAddress === '' && (
             <div className="text-base text-center py-3 w-5/6 mx-auto">
               <p>
                 {' '}
@@ -348,9 +201,9 @@ class Wallet extends Component {
               <br />
               <p> View multiple wallets together by combining addresses with a &lsquo;+&lsquo;</p>
             </div>
-          ) : null}
+          )}
         </div>
-        {this.state.walletAddress.length > 0 && this.state.nftMetadata !== null ? (
+        {this.state.walletAddress.length > 0 && this.state.nftMetadata !== null && (
           <div>
             <p className="text-3xl py-3 font-bold">
               Wallet Address:{' '}
@@ -358,7 +211,7 @@ class Wallet extends Component {
                 {this.state.walletAddress.split('+').join(', ')}
               </span>
             </p>
-            {this.state.nftMetadata.length !== 0 && this.state.floorData ? (
+            {this.state.nftMetadata.length !== 0 && !!this.state.floorData && (
               <div>
                 <p className="text-2xl font-bold">
                   Total Floor Value:{' '}
@@ -374,11 +227,11 @@ class Wallet extends Component {
                 </p>
                 {/* <p className={"text-gray-500 pb-3 text-base"}>Add more NFT collections to our API <a>here</a>.</p> */}
               </div>
-            ) : null}
+            )}
           </div>
-        ) : null}
+        )}
         {this.state.nftMetadata === null ? (
-          this.state.isLoading ? (
+          this.state.isLoading && (
             <p className="flex">
               <svg
                 width="24"
@@ -414,14 +267,12 @@ class Wallet extends Component {
                 'Loading NFTs...'
               )}
             </p>
-          ) : (
-            <p />
           )
         ) : this.state.nftMetadata.length === 0 ? (
           <p>No NFTs found! Go buy some on Solanart / DigitalEyes - #WAGMI</p>
         ) : (
           <div>
-            <div>{this.sortDropdown()}</div>
+            <SortDropdown onSelect={this.handleSortSelectChange} />
             <div className="grid grid-cols-2 md:grid-cols-6 gap-4 pt-3">
               {this.state.nftMetadata.map((metadata, i) => (
                 <div key={i} className="text-center">
@@ -432,13 +283,13 @@ class Wallet extends Component {
                   />
                   <div className="flex-col">
                     <p className="text-left font-bold pt-3 flex-initial">{metadata.uriJSON.name}</p>
-                    {this.state.floorData ? (
+                    {!!this.state.floorData && (
                       <p className="text-left text-gray-500 pt-1 flex-none">
                         {this.state.floorData[metadata.updateAuthority]
                           ? `${this.state.floorData[metadata.updateAuthority]}◎`
                           : 'N/A'}
                       </p>
-                    ) : null}
+                    )}
                   </div>
                 </div>
               ))}
