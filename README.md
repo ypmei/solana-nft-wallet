@@ -1,5 +1,10 @@
 # 使用说明
+代码修改：
+https://github.com/ypmei/solana-nft-wallet/commit/0014afa5f67c1ecfd68bb98abe2083d8d54367f3
 
+firebase config：
+src/components/WalletContainer/firebase-config.json
+这个参考地址：https://firebase.google.com/
 
 
 # Getting Started with Create React App

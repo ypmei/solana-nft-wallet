@@ -1,0 +1,10 @@
+{
+  "apiKey": "AIzaSyCrrbizAcT6TTcQ7tAWY4N8b0OBCHFviY0",
+  "authDomain": "solana-nft-wallet.firebaseapp.com",
+  "databaseURL": "https://solana-nft-wallet-default-rtdb.firebaseio.com",
+  "projectId": "solana-nft-wallet",
+  "storageBucket": "solana-nft-wallet.appspot.com",
+  "messagingSenderId": "989542714186",
+  "appId": "1:989542714186:web:b1ae9450f8d4de2b544fb3",
+  "measurementId": "G-MEHRTW1GSX"
+}
