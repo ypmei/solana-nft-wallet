@@ -94,9 +94,10 @@ class Wallet extends Component {
         }
       }
 
+      // nftMetadata: metadata.sort((a, b) => a.updateAuthority.localeCompare(b.updateAuthority)),
       this.setState({
         isLoading: false,
-        nftMetadata: metadata.sort((a, b) => a.updateAuthority.localeCompare(b.updateAuthority)),
+        nftMetadata: metadata,
       });
     }
   };

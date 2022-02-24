@@ -7,6 +7,7 @@
     "@firebase/app": "^0.7.2",
     "@firebase/firestore": "^3.1.0",
     "@headlessui/react": "^1.4.1",
+    "@metaplex-foundation/mpl-token-metadata": "^1.2.4",
     "@solana/spl-name-service": "^0.1.3",
     "@solana/spl-token": "^0.1.8",
     "@solana/web3.js": "^1.29.2",

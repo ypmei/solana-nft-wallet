@@ -2,7 +2,9 @@ import { clusterApiUrl, Connection, PublicKey } from '@solana/web3.js';
 import { deserializeUnchecked } from 'borsh';
 import { serverTimestamp } from '@firebase/firestore';
 // import { NameRegistryState } from '@solana/spl-name-service';
-import { Metadata, METADATA_SCHEMA } from './Metadata';
+// import { Metadata, METADATA_SCHEMA } from './Metadata';
+import { Metadata } from '@metaplex-foundation/mpl-token-metadata';
+
 import { firestore } from './LoadFloorData';
 import { getDomainOwner } from './loadSolDomainAddress';
 
@@ -83,31 +85,36 @@ export const loadWallet = async (walletAddress, totalCountCallback, currentCount
 
       // If we're not supposed to check Firebase OR the document from firebase doesn't exist, ping the API
       if (!seenWallet || !metadataInFirebase) {
-        const seeds = [
-          Buffer.from(SEED),
-          toPublicKey(METADATA_PROGRAM_ID).toBuffer(),
-          mintAddress.toBuffer(),
-        ];
-        const pdaAccount = await findProgramAddress(seeds, toPublicKey(METADATA_PROGRAM_ID));
-        const pdaAccountInfo = await connection.getParsedAccountInfo(pdaAccount);
-        const pdaAccountData = pdaAccountInfo.value.data;
-
-        const metadata = new Metadata(
-          deserializeUnchecked(METADATA_SCHEMA, Metadata, pdaAccountData)
-        );
-
+        // const seeds = [
+        //   Buffer.from(SEED),
+        //   toPublicKey(METADATA_PROGRAM_ID).toBuffer(),
+        //   mintAddress.toBuffer(),
+        // ];
+        // const pdaAccount = await findProgramAddress(seeds, toPublicKey(METADATA_PROGRAM_ID));
+        // const pdaAccountInfo = await connection.getParsedAccountInfo(pdaAccount);
+        // const pdaAccountData = pdaAccountInfo.value.data;
+        //
+        // const metadata = new Metadata(
+        //   deserializeUnchecked(METADATA_SCHEMA, Metadata, pdaAccountData)
+        // );
         // Add URI JSON to metadata
-        metadata.uriJSON = await getJSONFromURI(metadata.data.uri);
+        // metadata.uriJSON = await getJSONFromURI(metadata.data.uri);
 
         // Update Firebase with this NFT + metadata
-        uploadToFirebase[mintAddress.toString()] = JSON.stringify(metadata);
+        // uploadToFirebase[mintAddress.toString()] = JSON.stringify(metadata);
         // firestore.doc('metadata/'+mintAddress.toString()).set({"metadata":JSON.stringify(metadata)})
 
+        const tokenmetaPubkey = await Metadata.getPDA(mintAddress);
+        const metadata = await Metadata.load(connection, tokenmetaPubkey);
+        metadata.token = token;
+        metadata.uriJSON = await getJSONFromURI(metadata.data.data.uri);
         // Push metadata
         nftMetadata.push(metadata);
       } else {
         // Push metadata
-        nftMetadata.push(JSON.parse(doc.data()[mintAddress.toString()]));
+        const metadata = JSON.parse(doc.data()[mintAddress.toString()]);
+        metadata.token = token;
+        nftMetadata.push(metadata);
       }
     } catch (e) {
       console.log(e);
@@ -118,5 +125,24 @@ export const loadWallet = async (walletAddress, totalCountCallback, currentCount
     firestore.doc(`wallets/${walletAddress}`).update(uploadToFirebase);
   }
 
-  return nftMetadata.sort((a, b) => a.updateAuthority.localeCompare(b.updateAuthority));
+  // return nftMetadata.sort((a, b) => a.updateAuthority.localeCompare(b.updateAuthority));
+
+  const parsedMetaData = nftMetadata.map((metaData) => {
+    const { token, uriJSON } = metaData;
+    const { mint, owner, tokenAmount } = token.account.data.parsed.info;
+    const { name, image, description } = uriJSON;
+    return {
+      mint,
+      account: owner,
+      amount: tokenAmount,
+      name,
+      image,
+      description,
+      animationUrl: uriJSON.animation_url,
+    };
+  });
+
+  console.log('解析后的metadata的结果集：', parsedMetaData);
+
+  return nftMetadata;
 };
